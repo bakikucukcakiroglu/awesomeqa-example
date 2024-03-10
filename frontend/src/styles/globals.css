@@ -14,10 +14,6 @@ a {
   font-family: 'Sofia Sans', sans-serif !important;
 }
 
-#__next {
-  height: 100vh;
-}
-
 :root {
   color-scheme: dark;
 }

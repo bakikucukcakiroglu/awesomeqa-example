@@ -7,7 +7,7 @@ type HomeButtonProps = {
   onClick?: () => void;
 };
 
-export default function HomeButton({ icon, text, onClick }: HomeButtonProps) {
+export default function AwesomeHomeButton({ icon, text, onClick }: HomeButtonProps) {
 
   const iconWithStyle = React.isValidElement(icon)
     ? React.cloneElement(icon, {

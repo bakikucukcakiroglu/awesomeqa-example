@@ -12,9 +12,9 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Autocomplete, ButtonGroup, CircularProgress, FormControlLabel, Paper, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { useChannels, useDistinctTicketAuthors } from '../../../../queries/ticket.queries';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/router';
+import { useChannels, useTicketAuthors } from '../../../../queries/ticket.queries';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { FilterAlt } from '@mui/icons-material';
 
 type AwsomeFilterOptionsProps = {
@@ -36,20 +36,21 @@ export default function AwsomeFilterOptions({ open, onClose }: AwsomeFilterOptio
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const flagged: boolean = searchParams?.get("flagged") == "true";
   const author: string = searchParams?.get("author") || "";
   const channel: string = searchParams?.get("channel") || "";
 
-  const flaggedCheckboxRef = React.useRef(null);
-  const authorInputRef = React.useRef(null);
-  const channelInputRef = React.useRef(null);
+  const flaggedCheckboxRef = React.useRef<HTMLInputElement>(null);
+  const authorInputRef = React.useRef<HTMLInputElement>(null);
+  const channelInputRef = React.useRef<HTMLInputElement>(null);
 
   const channels = useChannels();
   const [channelComboboxOpen, setChannelComboboxOpen] = React.useState(false);
   const channelsLoading = channelComboboxOpen && !channels?.length;
 
 
-  const authors = useDistinctTicketAuthors();
+  const authors = useTicketAuthors();
   const [usersComboboxOpen, setUsersComboboxOpen] = React.useState(false);
   const usersLoading = usersComboboxOpen && !authors?.length;
 
@@ -68,33 +69,29 @@ export default function AwsomeFilterOptions({ open, onClose }: AwsomeFilterOptio
     return [];
   }, [authors]);
 
-
-
   const onFilter = () => {
     onClose();
     const params = new URLSearchParams(searchParams);
 
-    if (flaggedCheckboxRef.current.checked) {
+    if (flaggedCheckboxRef?.current?.checked) {
       params.set("flagged", "true");
     } else {
       params.delete("flagged");
     }
 
-    if (authorInputRef.current.value) {
+    if (authorInputRef?.current?.value) {
       params.set("author", authorInputRef.current.value);
     } else {
       params.delete("author");
     }
 
-    if (channelInputRef.current.value) {
+    if (channelInputRef?.current?.value) {
       params.set("channel", channelInputRef.current.value);
     } else {
       params.delete("channel");
     }
 
-    router.replace({
-      search: params.toString()
-    });
+    router.replace(`${pathname}?${params.toString()}`);
   }
 
   const handleClear = () => {
@@ -103,9 +100,7 @@ export default function AwsomeFilterOptions({ open, onClose }: AwsomeFilterOptio
     params.delete("flagged");
     params.delete("author");
     params.delete("channel");
-    router.replace({
-      search: params.toString()
-    });
+    router.replace(`${pathname}?${params.toString()}`);
   }
 
   return (
@@ -151,7 +146,7 @@ export default function AwsomeFilterOptions({ open, onClose }: AwsomeFilterOptio
                   setChannelComboboxOpen(false);
                 }}
                 loading={channelsLoading}
-                options={channels}
+                options={channels || []}
                 renderInput={(params) => (
                   <TextField
                     inputRef={channelInputRef}
@@ -192,7 +187,7 @@ export default function AwsomeFilterOptions({ open, onClose }: AwsomeFilterOptio
                     <img
                       loading="lazy"
                       width="20"
-                      src={authors.find((author) => author.id === option.id)?.avatar_url}
+                      src={authors?.find((author) => author.id === option.id)?.avatar_url}
                       alt=""
                     />
                     {option.label}
