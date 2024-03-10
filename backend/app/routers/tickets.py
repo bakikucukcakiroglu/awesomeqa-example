@@ -38,6 +38,8 @@ async def get_filtered_data(
         {"$unwind": "$message"},
     ]
 
+    pipeline.append({"$match": {"resolved_by": None}})
+
     if flagged is not None:
         pipeline.append({"$match": {"flagged": flagged}})
 
@@ -63,68 +65,6 @@ async def get_filtered_data(
     total_count = count_result[0]["total_count"] if count_result else 0
 
     return {"total_count": total_count, "data": ticket_data}
-
-
-@router.patch("/flag")
-async def update_flagged_tickets(
-    ticket_ids: List[str] = Body(..., embed=True),
-    flagged: bool = Body(..., embed=True),
-    db=Depends(get_db),
-):
-    if not ticket_ids:
-        raise HTTPException(status_code=400, detail="No ticket IDs provided.")
-
-    operations = [
-        UpdateOne({"_id": ticket_id}, {"$set": {"flagged": flagged}})
-        for ticket_id in ticket_ids
-    ]
-
-    result = await db.tickets.bulk_write(operations)
-
-    return {
-        "matched_count": result.matched_count,
-        "modified_count": result.modified_count,
-    }
-
-
-@router.put("/{ticket_id}")
-async def update_ticket(
-    ticket_id: str,
-    ticket_data: Dict,
-    db=Depends(get_db),
-):
-    """
-    Updates a ticket identified by its ID.
-    """
-
-    result = await db.tickets.update_one({"_id": ticket_id}, {"$set": ticket_data})
-
-    return {"_id": ticket_id, "modified_count": result.modified_count}
-
-
-@router.delete("/")
-async def delete_tickets(
-    ticket_ids: List[str] = Body(...),
-    db=Depends(get_db),
-):
-    """
-    Deletes multiple elements identified by their IDs.
-    """
-
-    try:
-        delete_result = await db.tickets.delete_many({"_id": {"$in": ticket_ids}})
-
-        if delete_result.deleted_count == 0:
-            raise HTTPException(
-                status_code=404, detail="No elements found with the provided IDs"
-            )
-
-        return JSONResponse(
-            {"message": f"{delete_result.deleted_count} elements deleted successfully"}
-        )
-    except Exception as e:
-        print(f"Error deleting elements: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/authors")
@@ -177,3 +117,111 @@ async def get_distinct_channels(db=Depends(get_db)):
 
     distinct_channels = [item["channel_id"] for item in result]
     return distinct_channels
+
+
+@router.get("/{ticket_id}", response_model=Dict)
+async def get_ticket_with_messages(ticket_id: str, db=Depends(get_db)):
+
+    ticket = await db.tickets.find_one({"_id": ticket_id})
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found.")
+
+    message_ids = {ticket.get("msg_id")} | set(ticket.get("context_messages", []))
+    message_ids.discard(None)
+
+    messages_cursor = db.messages.find({"_id": {"$in": list(message_ids)}}).sort(
+        "timestamp", 1
+    )
+    messages = await messages_cursor.to_list(None)
+
+    reference_msg_ids = {msg.get("reference_msg_id") for msg in messages}
+
+    if reference_msg_ids:
+        reference_messages_cursor = db.messages.find(
+            {"_id": {"$in": list(reference_msg_ids)}}
+        )
+        reference_messages = await reference_messages_cursor.to_list(None)
+
+        for msg in messages:
+            if msg.get("reference_msg_id"):
+                msg["reference_msg"] = next(
+                    (
+                        ref_msg
+                        for ref_msg in reference_messages
+                        if ref_msg["_id"] == msg["reference_msg_id"]
+                    ),
+                    None,
+                )
+
+    ticket["messages"] = messages
+
+    return ticket
+
+
+@router.patch("/flag")
+async def update_flagged_tickets(
+    ticket_ids: List[str] = Body(..., embed=True),
+    flagged: bool = Body(..., embed=True),
+    db=Depends(get_db),
+):
+    if not ticket_ids:
+        raise HTTPException(status_code=400, detail="No ticket IDs provided.")
+
+    try:
+        operations = [
+            UpdateOne({"_id": ticket_id}, {"$set": {"flagged": flagged}})
+            for ticket_id in ticket_ids
+        ]
+
+        result = await db.tickets.bulk_write(operations)
+
+    except Exception as e:
+        print(f"Error updating elements: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+    return {
+        "matched_count": result.matched_count,
+        "modified_count": result.modified_count,
+    }
+
+
+@router.patch("/resolved_by")
+async def resolve_tickets(
+    ticket_ids: List[str] = Body(...),
+    resolved_by: str = Body(...),
+    db=Depends(get_db),
+):
+    """
+    Resolves a list of tickets by setting the resolved_by field to the provided value.
+    """
+
+    try:
+        operations = [
+            UpdateOne({"_id": ticket_id}, {"$set": {"resolved_by": resolved_by}})
+            for ticket_id in ticket_ids
+        ]
+
+        result = await db.tickets.bulk_write(operations)
+
+        return {
+            "matched_count": result.matched_count,
+            "modified_count": result.modified_count,
+        }
+    except Exception as e:
+        print(f"Error updating elements: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.put("/{ticket_id}")
+async def update_ticket(
+    ticket_id: str,
+    ticket_data: Dict,
+    db=Depends(get_db),
+):
+    """
+    Updates a ticket identified by its ID.
+    """
+
+    result = await db.tickets.update_one({"_id": ticket_id}, {"$set": ticket_data})
+
+    return {"_id": ticket_id, "modified_count": result.modified_count}
