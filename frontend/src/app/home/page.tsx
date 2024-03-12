@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Box, Grid } from "@mui/material";
 import { LibraryBooksOutlined, LightbulbOutlined, SupportAgent } from "@mui/icons-material";
 import AwesomeHomeButton from "./components/AwesomeHomeButton";
-import HeadComponent from "../../components/Head";
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -25,7 +24,7 @@ const Home: NextPage = () => {
               }}
             >
               <AwesomeHomeButton icon={<LibraryBooksOutlined />} text="Knowledge Base" />
-              <Link href={"/tickets?page=1"} style={{ flex: 1 }}>
+              <Link href={"/tickets?page=1&status=open"} style={{ flex: 1 }}>
                 <AwesomeHomeButton icon={<SupportAgent />} text="Tickets" />
               </Link>
               <AwesomeHomeButton icon={<LightbulbOutlined />} text="FAQ Insights" />
