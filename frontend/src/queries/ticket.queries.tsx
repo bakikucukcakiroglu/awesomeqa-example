@@ -1,17 +1,30 @@
 import { enqueueSnackbar, useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { Ticket, TicketsResponse } from "../types";
-import { Author } from "next/dist/lib/metadata/types/metadata-types";
+import { Ticket, TicketsResponse, Author } from "../types";
+
+
+const AUTHOR_ADMIN = {
+  "author": {
+    "id": "208997",
+    "name": "Saul Goodman",
+    "nickname": "saul",
+    "avatar_url": "https://cdn.discordapp.com/avatars/988762531663327302/1e8745b161f3bc10fb5e3be942fd2774.png?size=1024",
+  }
+}
+
+const msg_url = `https://discord.com/channels/888373065871747594/888373065871747597`
 
 
 type UseTicketsProps = {
   page: number,
   flagged: boolean,
   author: string,
-  channel: string
+  channel: string,
+  status: string,
+  query: string
 }
 
-export function useTickets({ page, flagged, author, channel }: UseTicketsProps) {
+export function useTickets({ page, flagged, author, channel, status, query }: UseTicketsProps) {
 
   const size: number = 20;
 
@@ -19,8 +32,11 @@ export function useTickets({ page, flagged, author, channel }: UseTicketsProps) 
 
   params.set("page", page?.toString());
   params.set("size", size.toString());
+  flagged && params.set("flagged", "true")
   params.set("author", author);
   params.set("channel", channel);
+  params.set("status", status);
+  params.set("query", query);
 
   const [tickets, setTickets] = useState<TicketsResponse | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,7 +51,7 @@ export function useTickets({ page, flagged, author, channel }: UseTicketsProps) 
     if (!enabled) return;
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tickets?${params.toString()}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tickets/?${params.toString()}`);
       const data = await response.json();
       setTickets(data);
     } catch (error) {
@@ -45,11 +61,11 @@ export function useTickets({ page, flagged, author, channel }: UseTicketsProps) 
   }
 
   useEffect(() => {
+    console.log('useTickets effect');
     fetchData();
-  }, [page, flagged, author, channel, enabled, size]);
+  }, [page, flagged, author, channel, status, query, enabled, size]);
 
   return { refetch, loading, page, tickets, enabled, setEnabled, size };
-
 }
 
 export function useTicket(id: string) {
@@ -81,21 +97,30 @@ export function useTicket(id: string) {
   return { loading, ticket, refetch };
 }
 
-export function useResolveTickets(refetch: () => void) {
+export function useResolveTicket(refetch: () => void) {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const resolveTickets = (ids) => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tickets/resolved_by`, {
-      method: 'PATCH',
+  const resolveTicket = ({
+    id,
+    content,
+    reply_to_message_id
+  }) => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tickets/${id}/resolve`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ ticket_ids: ids, resolved_by: 'admin' })
+      body: JSON.stringify({
+        content,
+        reply_to_message_id,
+        ...AUTHOR_ADMIN,
+        msg_url
+      })
     }).then(() => {
 
-      enqueueSnackbar(ids?.length > 1 ? 'Tickets resolved!' : "Ticket resolved!", { variant: 'success' });
-      console.log('Deleted tickets:', ids);
+      enqueueSnackbar("Ticket resolved!", { variant: 'success' });
+      console.log('Resolved ticket:', id);
       refetch();
     }).catch((error) => {
       console.error('Error deleting tickets:', error);
@@ -103,7 +128,49 @@ export function useResolveTickets(refetch: () => void) {
     })
   }
 
-  return resolveTickets;
+  return resolveTicket;
+}
+
+export function useCloseTickets(refetch: () => void) {
+
+  const closeTickets = (ids) => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tickets/close`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(ids)
+    }).then(() => {
+      enqueueSnackbar(ids?.length > 1 ? 'Tickets closed!' : "Ticket closed!", { variant: 'success' });
+      console.log('Closed tickets:', ids);
+      refetch();
+    }).catch((error) => {
+      console.error('Error closing tickets:', error);
+    })
+  }
+
+  return closeTickets;
+}
+
+export function useOpenTickets(refetch: () => void) {
+
+  const openTickets = (ids) => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tickets/open`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(ids)
+    }).then(() => {
+      enqueueSnackbar(ids?.length > 1 ? 'Tickets re-opened!' : "Ticket re-opened!", { variant: 'success' });
+      console.log('Opened tickets:', ids);
+      refetch();
+    }).catch((error) => {
+      console.error('Error opening tickets:', error);
+    })
+  }
+
+  return openTickets;
 }
 
 export function useFlagTickets() {
@@ -120,6 +187,7 @@ export function useFlagTickets() {
 
   return flagTicket;
 }
+
 
 export function useUpdateTicket(refetch: () => void) {
 
