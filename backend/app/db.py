@@ -11,9 +11,6 @@ from .config.config import (
     MIN_CONNECTIONS_COUNT,
 )
 
-print(f"Connectingggg to {MONGODB_URL}")
-logger.info(f"Connecting123 to {MONGODB_URL}")
-
 client = AsyncIOMotorClient(
     str(MONGODB_URL),
     maxPoolSize=MAX_CONNECTIONS_COUNT,
