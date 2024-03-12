@@ -50,14 +50,14 @@ export default function AwesomeInputBase({ onClickFilterOptions, onQueryChange, 
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      <IconButton type="button" aria-label="search" onClick={onClickFilterOptions}>
+      <IconButton type="button" id="filter-options-anchor" aria-label="search" onClick={onClickFilterOptions}>
         <Badge
           color="secondary"
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'right',
           }}
-          badgeContent={activeFilterCount > 0 ? Math.max(searchParams?.size - 1, 0) : 0}
+          badgeContent={activeFilterCount}
         >
           <Tune />
         </Badge>

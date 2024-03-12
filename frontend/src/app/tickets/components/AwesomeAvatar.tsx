@@ -55,6 +55,7 @@ export default function AwesomeAvatar({ src, fallbackColor, fallbackLetter, uniq
     >
       {
         (src && !isError) ? <img
+          loading="lazy"
           src={src}
           width={40}
           height={40}
