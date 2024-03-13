@@ -1,8 +1,7 @@
-import { Box, ButtonBase, Dialog, DialogTitle, Divider, IconButton, Stack, TextareaAutosize, Typography } from "@mui/material";
+import { Box, ButtonBase, Dialog, DialogTitle, Divider, IconButton, Stack, Typography } from "@mui/material";
 import AwesomeIcon from "../../../../components/AwesomeIcon";
 import { useState } from "react";
 import { Send } from "@mui/icons-material";
-import { useResolveTicket } from "../../../../queries/ticket.queries";
 
 type AwesomeResolverProps = {
   open: boolean,

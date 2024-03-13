@@ -2,7 +2,7 @@ import { enqueueSnackbar, useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { Ticket, TicketsResponse, Author } from "../types";
 
-
+//HARD CODED FOR DEMO PURPOSES
 const AUTHOR_ADMIN = {
   "author": {
     "id": "208997",
@@ -11,7 +11,6 @@ const AUTHOR_ADMIN = {
     "avatar_url": "https://cdn.discordapp.com/avatars/988762531663327302/1e8745b161f3bc10fb5e3be942fd2774.png?size=1024",
   }
 }
-
 const msg_url = `https://discord.com/channels/888373065871747594/888373065871747597`
 
 

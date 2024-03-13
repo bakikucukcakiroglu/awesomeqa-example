@@ -1,5 +1,4 @@
-import { ListItemAvatar, Stack, Typography } from "@mui/material";
-import AwesomeAvatar from '../../components/AwesomeAvatar';
+import { Stack } from "@mui/material";
 import AwesomeMessage from "./AwesomeMessage/AwesomeMessage";
 
 type AwesomeReplyProps = {
@@ -9,7 +8,6 @@ type AwesomeReplyProps = {
 }
 
 const LShape = () => {
-
   return <span style={{ position: "absolute", top: "19px", left: "18px", zIndex: "-1" }}>
     <div style={{ width: "40px", height: "1px", borderTop: "1px solid white" }} />
     <div style={{ height: "20px", width: "1px", borderLeft: "1px solid white" }} />
@@ -19,7 +17,6 @@ const LShape = () => {
 export default function AwesomeReply({ message, isTicketMessage = false, handleDeleteContextMessage }: AwesomeReplyProps) {
 
   return (
-
     <Stack alignItems={"flex-start"} sx={{ position: "relative", margin: 1 }}>
       <AwesomeMessage
         message={message?.reference_msg}
@@ -32,7 +29,6 @@ export default function AwesomeReply({ message, isTicketMessage = false, handleD
         isTicketMessage={isTicketMessage}
         handleDeleteContextMessage={handleDeleteContextMessage}
       />
-
     </Stack>
   )
 }

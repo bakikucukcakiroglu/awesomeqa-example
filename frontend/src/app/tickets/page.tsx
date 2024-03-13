@@ -2,22 +2,23 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, usePathname, useSearchParams } from 'next/navigation';
-import { useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format } from "date-fns";
 import {
-  Badge, Box, Checkbox, Chip, Divider, IconButton, LinearProgress, List, ListItemAvatar, ListItemButton,
-  ListItemIcon, ListItemText, Skeleton, Stack, Tooltip, Typography
+  Badge, Box, Checkbox, Chip, Divider, IconButton, LinearProgress, List, ListItemAvatar,
+  ListItemButton, ListItemIcon, ListItemText, Skeleton, Stack, Tooltip, Typography
 } from "@mui/material";
-import { CheckCircleOutline, CheckOutlined, Close, CloseOutlined, DateRange, FiberManualRecord, FiberManualRecordOutlined, Flag, FlagOutlined, Forum, Loop, NavigateBefore, NavigateNext, Refresh, Tag } from "@mui/icons-material";
+import {
+  CheckCircleOutline, Close, DateRange, Flag, FlagOutlined, Forum, Loop, NavigateBefore,
+  NavigateNext, Refresh, Tag
+} from "@mui/icons-material";
+import { useFlagTickets, useTickets, useCloseTickets, useOpenTickets } from "../../queries/ticket.queries";
 import AwesomeAvatar from "./components/AwesomeAvatar";
 import AwsomeFilterOptions from "./components/AwesomeFilterOptions/AwesomeFilterOptions";
 import AwesomeInputBase from "./components/AwesomeInputBase";
-import { useFlagTickets, useTickets, useCloseTickets, useOpenTickets } from "../../queries/ticket.queries";
-import DiscordIcon from "../../components/DiscordIcon";
-
-import { Ticket } from "../../types";
 import AwesomeStatusChip from "./[id]/components/AwesomeStatusChip";
+import DiscordIcon from "../../components/DiscordIcon";
+import { Ticket } from "../../types";
 
 export default function Tickets() {
 
@@ -45,9 +46,11 @@ export default function Tickets() {
 
   const flag = !rowSelection?.every((ticket) => ticketsToDisplay?.find((t) => t._id === ticket)?.flagged);
 
+
+  console.log("tickets", ticketsToDisplay);
+
   useEffect(() => {
 
-    console.log("searchParams?.size", searchParams?.size);
     if (!params.id) {
       if (!enabled) {
         setEnabled(true);
@@ -297,7 +300,7 @@ export default function Tickets() {
           <List>
             {
               tickets?.data ?
-                (tickets?.data || ticketsToDisplay).map((ticket) => (
+                (ticketsToDisplay).map((ticket) => (
                   <ListItemButton
                     key={ticket._id}
                     onClick={() => {
@@ -310,8 +313,6 @@ export default function Tickets() {
                       localStorage.setItem("channel", channel);
                       localStorage.setItem("status", status);
                       localStorage.setItem("query", query);
-
-                      // localStorage.setItem("page", page.toString());
                     }}
                     sx={{
                       '&:hover': {

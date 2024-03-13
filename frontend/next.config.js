@@ -4,6 +4,9 @@ const nextConfig = {
   images: {
     domains: ['cdn.discordapp.com'], // Replace 'example.com' with the domain where your images are hosted
   },
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
   async redirects() {
     return [
       {

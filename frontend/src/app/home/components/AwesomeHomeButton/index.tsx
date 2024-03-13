@@ -1,5 +1,5 @@
-import { Box, ButtonBase, IconProps, Typography } from "@mui/material";
 import React, { ReactElement } from "react";
+import { ButtonBase, IconProps, Typography } from "@mui/material";
 
 type HomeButtonProps = {
   icon: ReactElement<IconProps>;

@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
-import { Search, Tune } from "@mui/icons-material";
-import { Badge, BadgeProps, IconButton, InputBase, Paper } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import styled from "@emotion/styled";
+import { Badge, BadgeProps, IconButton, InputBase, Paper } from "@mui/material";
+import { Search, Tune } from "@mui/icons-material";
 
 type CustomizedInputBaseProps = {
   onClickFilterOptions: () => void;

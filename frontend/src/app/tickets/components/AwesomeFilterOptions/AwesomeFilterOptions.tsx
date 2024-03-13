@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -10,14 +9,13 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Autocomplete, ButtonGroup, Chip, CircularProgress, Dialog, FormControlLabel, Menu, Paper, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Autocomplete, CircularProgress, FormControlLabel, Menu, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useChannels, useTicketAuthors } from '../../../../queries/ticket.queries';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { CheckOutlined, Close, FiberManualRecordOutlined, FilterAlt } from '@mui/icons-material';
+import { FilterAlt } from '@mui/icons-material';
 import AwesomeStatusChip from '../../[id]/components/AwesomeStatusChip';
-
 
 type AwsomeFilterOptionsProps = {
   open: boolean;
@@ -226,16 +224,6 @@ export default function AwsomeFilterOptions({ open, onClose, anchor }: AwsomeFil
                 />
               )}
             />
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor='date' sx={{ fontWeight: 'bold' }}>
-              Date
-            </FormLabel>
-            <Stack direction="row" spacing={2} alignItems={"center"}>
-              <DatePicker ></DatePicker>
-              <Typography variant="h6">-</Typography>
-              <DatePicker></DatePicker>
-            </Stack>
           </FormControl>
           <FormControlLabel control={<Checkbox defaultChecked={flagged} inputRef={flaggedCheckboxRef} />} label="Show only flagged tickets." />
           <FormControl>

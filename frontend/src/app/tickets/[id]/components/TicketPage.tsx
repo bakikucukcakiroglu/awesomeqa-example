@@ -1,15 +1,15 @@
 "use client"
-import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useOpenTickets, useResolveTicket, useTicket, useUpdateTicket } from "../../../../queries/ticket.queries";
+import { useState } from 'react';
+import { useParams } from 'next/navigation'
+import { format } from 'date-fns';
 import { Box, Button, Chip, Divider, Skeleton, Stack, Typography } from "@mui/material";
+import { Close, Loop } from "@mui/icons-material";
+import { useResolveTicket, useTicket, useUpdateTicket } from "../../../../queries/ticket.queries";
+import AwesomeIcon from "../../../../components/AwesomeIcon";
 import AwesomeMessage from "./AwesomeMessage/AwesomeMessage";
 import AwesomeReply from "./AwesomeReply";
-import AwesomeIcon from "../../../../components/AwesomeIcon";
-import { Close, Loop } from "@mui/icons-material";
 import AwesomeResolver from './AwesomeResolver';
-import { useState } from 'react';
 import AwesomeStatusChip from './AwesomeStatusChip';
-import { format } from 'date-fns';
 
 export default function TicketPage() {
 

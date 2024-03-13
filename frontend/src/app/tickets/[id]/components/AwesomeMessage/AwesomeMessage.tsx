@@ -1,12 +1,10 @@
-import { Box, IconButton, ListItemAvatar, Stack, Tooltip, Typography } from "@mui/material";
+import { ListItemAvatar, Stack, Tooltip, Typography } from "@mui/material";
 import AwesomeAvatar from '../../../components/AwesomeAvatar';
 import { StackProps } from "@mui/material";
-import { Delete, DeleteOutline, RemoveCircleOutline } from "@mui/icons-material";
-import { format, formatDistanceToNow } from "date-fns";
+import { RemoveCircleOutline } from "@mui/icons-material";
+import { format } from "date-fns";
 import DiscordIcon from "../../../../../components/DiscordIcon";
-import styles from "./AwesomeMessage.module.css";
 import Link from "next/link";
-import { useUpdateTicket } from "../../../../../queries/ticket.queries";
 
 type AwesomeMessageProps = {
   message: any,
@@ -17,9 +15,7 @@ type AwesomeMessageProps = {
   showAvatar?: boolean
 }
 
-
 export default function AwesomeMessage({ message, isTicketMessage = false, isReply, props, handleDeleteContextMessage, showAvatar = true }: AwesomeMessageProps) {
-
 
   return (
     <Stack direction={"row"} {...props}>
@@ -80,18 +76,6 @@ export default function AwesomeMessage({ message, isTicketMessage = false, isRep
               {message?.content}
             </Typography>
           </Stack >
-
-          {/* <IconButton
-        sx={{
-          color: "white",
-          padding: 0,
-          margin: 0,
-          position: "absolute",
-          top: 0,
-        }}
-      >
-        <DateRange />
-      </IconButton> */}
         </Stack >
         {!isReply ?
           <Stack direction={"row"} gap={1} alignItems={"center"}>
