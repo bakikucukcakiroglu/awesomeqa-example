@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  fastapi:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+
+  nextjs:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+
+  mongo_seed:
+    image: mongo:latest
+    links:
+      - mongodb
+    volumes:
+      - ./mongo-seed:/mongo-seed
+    command: /mongo-seed/import.sh
+
+volumes:
+  mongodb_data:
