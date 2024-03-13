@@ -1,6 +1,6 @@
 .PHONY: transform-data
 transform-data:
-	python transform_data.py
+	python3 transform_data.py
 
 
 .PHONY: setup-environment

@@ -1,11 +1,14 @@
 import json
+import os
 
 
 def transform_json(input_file, output_folder):
+
+    os.makedirs(output_folder, exist_ok=True)
+
     with open(input_file, "r") as f:
         data = json.load(f)
 
-    # Assuming data is a dictionary with "tickets" and "messages" keys
     tickets = data["tickets"]
     messages = data["messages"]
 
@@ -20,5 +23,4 @@ def transform_json(input_file, output_folder):
         json.dump(messages, f, indent=4)
 
 
-# Usage example:
 transform_json("./data/awesome_tickets.json", "./mongo-seed/data")
